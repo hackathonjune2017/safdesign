@@ -1,0 +1,17 @@
+{
+  "lockfileVersion": 1,
+  "dependencies": {
+    "dateformat": "^2.0.0",
+    "joi": "^10.6.0",
+    "joi-plain": "^0.1.1"
+  },
+  "name": "package.json",
+  "description": "An ArangoDB Foxx Demo Application ================================",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

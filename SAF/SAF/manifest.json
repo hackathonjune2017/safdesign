@@ -1,0 +1,20 @@
+{
+  "name": "Suitability",
+  "version": "1.0.0",
+  "description": "This for demo",
+  "author": "SAF",
+  "thumbnail": "thumbnail.png",
+
+  "engines": {
+    "arangodb": "^3.0.0"
+  },
+
+  "main": "index.js",
+  "defaultDocument": "index.html",
+
+  "scripts": {
+    "setup": "scripts/setup.js"
+  }
+
+  
+}
