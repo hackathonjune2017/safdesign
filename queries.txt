@@ -1,0 +1,68 @@
+
+
+http://127.0.0.1:8529/_db/SAF/_admin/aardvark/index.html#queries
+
+
+--- Client to AH and Client to BO
+
+FOR parties IN  client_party_edge 
+FILTER  parties._from=='customer/123486'  
+RETURN parties
+
+
+
+FOR parties IN  client_party_edge 
+FILTER  parties._from=='customer/123486' and parties.relation=='Beneficial owner'
+RETURN parties
+
+
+
+// customer - ticket details 
+ 
+for ticket in any 'customer/123486' customer_ticket_edge
+OPTIONS {bfs: true, uniqueVertices: 'global'} 
+//filter ticket.status=='Approved'
+//filter ticket.status=='inProgress'
+FOR snapshot IN ANY ticket._id ticket_snapshot_edge 
+OPTIONS {bfs: true, uniqueVertices: 'global'} 
+FOR forms IN ANY snapshot._id snapshot_forms_edge 
+OPTIONS {bfs: true, uniqueVertices: 'global'} 
+FOR custForm IN any forms._id form_customer_edge
+
+RETURN {
+ticket:ticket.ticketId,TicketStatus:ticket.status,TicketType:ticket.review_type,
+'Creation Date':ticket.creationtDate,'Approval Date':ticket.endDate,
+ FormType:forms.type,FormsData:forms.questionnaire,
+ 'Filled By':custForm.id,'Customer Name':custForm.name
+ }
+ 
+// customer ticket workflow
+
+ for ticket in any 'customer/123486' customer_ticket_edge
+OPTIONS {bfs: true, uniqueVertices: 'global'} 
+//filter ticket.status=='Approved'
+//filter ticket.status=='inProgress'
+FOR audit IN ANY ticket._id ticket_audit_edge 
+OPTIONS {bfs: true, uniqueVertices: 'global'} 
+sort ticket.ticketId,audit.creationtDate
+RETURN 
+{ticket:ticket.ticketId,TicketStatus:ticket.status,TicketType:ticket.review_type,
+'Creation Date':ticket.creationtDate,'Approval Date':ticket.endDate,
+Reviewer:audit.reviewer,Action:audit.action, 
+Stage:audit.stage,StartDate:audit.creationtDate
+}
+
+
+-- Client Suitability
+
+
+FOR parties IN ANY  'customer/123486' client_party_edge 
+OPTIONS {bfs: true, uniqueVertices: 'global'} 
+
+FOR SAFFroms IN UNION_DISTINCT((FOR forms IN ANY parties._id customer_latestform_edge 
+OPTIONS {bfs: true, uniqueVertices: 'global'} 
+RETURN forms),(FOR customer IN ANY 'customer/123486' customer_latestform_edge 
+OPTIONS {bfs: true, uniqueVertices: 'global'} 
+RETURN customer)) RETURN  DISTINCT
+
+{FormId:SAFFroms._key,Type:SAFFroms.type,questions:SAFFroms.questionnaire,CreationDate:SAFFroms.creationtDate}
